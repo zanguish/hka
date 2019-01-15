@@ -1,5 +1,5 @@
 {
-  "name": "GEGEzhenweigege/php-keep-alive",
+  "name": "zanguish/php-keep-alive",
   "description": "A  http client written in PHP for keep-alive",
   "type": "library",
   "license": "MIT",
