@@ -7,7 +7,7 @@ PHP >= 7.0.0
 
 Install
 -------
-    composer require zanguish/php-keep-alive
+    composer require zanguish/hka
 
 Usage
 -------
