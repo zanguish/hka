@@ -107,6 +107,9 @@ class Hka
         } else {
             self::$_fd = @pfsockopen(self::$_host, self::$_port, $errno, $errstr, self::$_timeout);
         }
+        if (!self::$_fd) {
+            throw new \RuntimeException('fsockopen fail');
+        }
         stream_set_timeout(self::$_fd, self::$_timeout);
         if (strlen($errstr) || $errno != 0) {
             throw new \RuntimeException(sprintf('[errno:%s;errstr:%s]', $errno, $errstr));
@@ -285,11 +288,11 @@ class Hka
                 $data = substr($data, $headerSize);
                 curl_close($ch);
             } catch (\Exception $e) {
-                self::$_lastStats['code'] = $e->getCode() ?? self::_EXP_CODE;
+                self::$_lastStats['code'] = $e->getCode() ?: self::_EXP_CODE;
                 self::$_lastStats['msg'] = get_class($e) . ":" . $e->getMessage();
                 $data = false;
             } catch (\Throwable $throwable) {
-                self::$_lastStats['code'] = $throwable->getCode() ?? self::_EXP_CODE;
+                self::$_lastStats['code'] = $throwable->getCode() ?: self::_EXP_CODE;
                 self::$_lastStats['msg'] = get_class($throwable) . ":" . $throwable->getMessage();
                 $data = false;
             }
@@ -399,11 +402,11 @@ class Hka
             self::req($url, strtoupper($method), $data);
             return self::rep();
         } catch (\Exception $e) {
-            self::$_lastStats['code'] = $e->getCode() ?? self::_EXP_CODE;
+            self::$_lastStats['code'] = $e->getCode() ?: self::_EXP_CODE;
             self::$_lastStats['msg'] = get_class($e) . ":" . $e->getMessage();
             return false;
         } catch (\Throwable $throwable) {
-            self::$_lastStats['code'] = $throwable->getCode() ?? self::_EXP_CODE;
+            self::$_lastStats['code'] = $throwable->getCode() ?: self::_EXP_CODE;
             self::$_lastStats['msg'] = get_class($throwable) . ":" . $throwable->getMessage();
             return false;
         }
