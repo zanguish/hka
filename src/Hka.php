@@ -107,6 +107,7 @@ class Hka
         } else {
             self::$_fd = @pfsockopen(self::$_host, self::$_port, $errno, $errstr, self::$_timeout);
         }
+        stream_set_timeout(self::$_fd, self::$_timeout);
         if (strlen($errstr) || $errno != 0) {
             throw new \RuntimeException(sprintf('[errno:%s;errstr:%s]', $errno, $errstr));
         }
@@ -329,6 +330,8 @@ class Hka
             }
         }
         if ($recv_err) {
+            self::$_lastStats['code'] = 504;
+            self::$_lastStats['msg'] = self::$_codes[504];
             return false;
         }
         self::setRepHeader(rtrim($responseHeader));
