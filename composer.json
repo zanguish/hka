@@ -1,5 +1,5 @@
 {
-  "name": "zanguish/php-keep-alive",
+  "name": "zanguish/hka",
   "description": "A  http client written in PHP for keep-alive",
   "type": "library",
   "license": "MIT",
@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Hka\\": "src/"
+      "hka\\": "src/"
     }
   }
 }
