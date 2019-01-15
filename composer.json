@@ -1,0 +1,20 @@
+{
+  "name": "GEGEzhenweigege/php-keep-alive",
+  "description": "A  http client written in PHP for keep-alive",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zhenwei",
+      "email": "zw13476587420@163.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hka\\": "src/"
+    }
+  }
+}
