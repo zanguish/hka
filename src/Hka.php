@@ -211,7 +211,7 @@ class Hka
 
     protected static function setRepHeader($headerStr)
     {
-        $tmp = explode("\r\n", $headerStr);
+        $tmp = array_values(array_filter(explode("\r\n", $headerStr), 'strlen'));
         $headers = [];
         foreach ($tmp as $k => $v) {
             if ($k == 0) {
@@ -283,7 +283,7 @@ class Hka
                 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
                 $header = substr($data, 0, $headerSize);
                 if ($header) {
-                    self::setRepHeader(rtrim($header));
+                    self::setRepHeader(trim($header));
                 }
                 $data = substr($data, $headerSize);
                 curl_close($ch);
@@ -303,7 +303,11 @@ class Hka
     protected static function req($url, $method, $data)
     {
         if (!self::$_isCurl) {
-            fwrite(self::$_fd, self::$_reqHeaderStr);
+            $len = @fwrite(self::$_fd, self::$_reqHeaderStr);
+            if (!$len) {
+                fclose(self::$_fd);
+                throw new \RuntimeException('fwrite fail');
+            }
         } else {
             foreach (self::$_header as $k => $v) {
                 $header[] = "{$k}:{$v}";
@@ -332,16 +336,23 @@ class Hka
                 break;
             }
         }
-        if ($recv_err) {
+        $status = stream_get_meta_data(self::$_fd);
+        if ($status['timed_out']) {
+            fclose(self::$_fd);
             self::$_lastStats['code'] = 504;
             self::$_lastStats['msg'] = self::$_codes[504];
             return false;
         }
-        self::setRepHeader(rtrim($responseHeader));
+        if ($recv_err) {
+            fclose(self::$_fd);
+            return false;
+        }
+        self::setRepHeader(trim($responseHeader));
 
         //redirect
         if (in_array(self::$_lastStats['code'], [301, 302])) {
             if (self::$_redirectNum >= self::_REDIRECT_MAX) {
+                fclose(self::$_fd);
                 throw new \RuntimeException('too many redirects', 310);
             }
             $location = self::$_repHeader['Location'];
