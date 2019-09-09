@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "hka\\": "src/"
+      "Hka\\": "src/"
     }
   }
 }
