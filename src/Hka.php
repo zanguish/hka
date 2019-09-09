@@ -1,5 +1,6 @@
 <?php
 
+namespace Hka;
 class Hka
 {
     const _TIMEOUT = 30;
