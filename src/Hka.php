@@ -1,6 +1,5 @@
 <?php
 
-namespace Hka;
 class Hka
 {
     const _TIMEOUT = 30;
@@ -245,57 +244,53 @@ class Hka
     protected static function getHttpContent($url, $method = 'GET', $postData = array(), $header = [])
     {
         $data = '';
-        if (!empty($url)) {
-            try {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
 
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-                curl_setopt($ch, CURLOPT_HEADER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_TIMEOUT, self::$_timeout);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-                if (strtoupper($method) == 'POST') {
-                    $curlPost = is_array($postData) ? http_build_query($postData) : $postData;
-                    curl_setopt($ch, CURLOPT_POST, 1);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, self::$_timeout);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            if (strtoupper($method) == 'POST') {
+                $curlPost = is_array($postData) ? http_build_query($postData) : $postData;
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
 
-                    if (self::$_sslCerts) {
-                        curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
-                        curl_setopt($ch, CURLOPT_SSLCERT, self::$_sslCerts['cert_pem']);
+                if (self::$_sslCerts) {
+                    curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
+                    curl_setopt($ch, CURLOPT_SSLCERT, self::$_sslCerts['cert_pem']);
 
-                        curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
-                        curl_setopt($ch, CURLOPT_SSLKEY, self::$_sslCerts['key_pem']);
-                    }
+                    curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
+                    curl_setopt($ch, CURLOPT_SSLKEY, self::$_sslCerts['key_pem']);
                 }
-                $data = curl_exec($ch);
-
-                if (!curl_errno($ch)) {
-                    self::$_lastStats['code'] = $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                    self::$_lastStats['msg'] = isset(self::$_codes[$code]) ? self::$_codes[$code] : self::_EXP_MSG;
-                } else {
-                    self::$_lastStats['code'] = curl_errno($ch);
-                    self::$_lastStats['msg'] = curl_error($ch);
-                }
-
-                $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-                $header = substr($data, 0, $headerSize);
-                if ($header) {
-                    self::setRepHeader(trim($header));
-                }
-                $data = substr($data, $headerSize);
-                curl_close($ch);
-            } catch (\Exception $e) {
-                self::$_lastStats['code'] = $e->getCode() ?: self::_EXP_CODE;
-                self::$_lastStats['msg'] = get_class($e) . ":" . $e->getMessage();
-                $data = false;
-            } catch (\Throwable $throwable) {
-                self::$_lastStats['code'] = $throwable->getCode() ?: self::_EXP_CODE;
-                self::$_lastStats['msg'] = get_class($throwable) . ":" . $throwable->getMessage();
-                $data = false;
             }
+            $data = curl_exec($ch);
+
+            if (!curl_errno($ch)) {
+                self::$_lastStats['code'] = $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                self::$_lastStats['msg'] = isset(self::$_codes[$code]) ? self::$_codes[$code] : self::_EXP_MSG;
+            } else {
+                self::$_lastStats['code'] = curl_errno($ch);
+                self::$_lastStats['msg'] = curl_error($ch);
+            }
+
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($data, 0, $headerSize);
+            if ($header) {
+                self::setRepHeader(trim($header));
+            }
+            $data = substr($data, $headerSize);
+            curl_close($ch);
+        } catch (\Exception $e) {
+            self::$_lastStats['code'] = $e->getCode() ?: self::_EXP_CODE;
+            self::$_lastStats['msg'] = get_class($e) . ":" . $e->getMessage();
+        } catch (\Throwable $throwable) {
+            self::$_lastStats['code'] = $throwable->getCode() ?: self::_EXP_CODE;
+            self::$_lastStats['msg'] = get_class($throwable) . ":" . $throwable->getMessage();
         }
         return $data;
     }
@@ -441,4 +436,3 @@ class Hka
         return self::$_repHeader;
     }
 }
-
